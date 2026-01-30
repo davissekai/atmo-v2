@@ -91,7 +91,7 @@ export function Chat() {
                   </h2>
                 </div>
 
-                <div className="w-full mb-12">
+                <div className="w-full mb-4 md:mb-12">
                   <SuggestionCards onSelect={(prompt) => setInput(prompt)} />
                 </div>
               </div>
@@ -133,14 +133,14 @@ export function Chat() {
               e.preventDefault();
               handleSubmit();
             }}
-            className="flex items-end gap-2 p-1.5 md:p-2 border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl rounded-full overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
+            className="flex items-end gap-2 p-1.5 md:p-2 border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl rounded-[26px] overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
           >
             {/* Deep Think Toggle (Inline) */}
             <button
               type="button"
               onClick={() => setIsDeepThink(!isDeepThink)}
               className={cn(
-                "flex items-center justify-center size-8 md:size-10 shrink-0 rounded-full transition-all duration-300",
+                "flex items-center justify-center size-8 md:size-10 shrink-0 rounded-full transition-all duration-300 mb-0.5",
                 isDeepThink
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                   : "bg-white/5 text-muted-foreground hover:bg-white/10"
@@ -158,7 +158,7 @@ export function Chat() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
-              className="flex-1 min-h-[40px] max-h-[200px] py-2.5 px-2 md:px-4 text-sm md:text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/50 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
+              className="flex-1 min-h-[40px] max-h-[200px] py-3 px-2 md:px-4 text-sm md:text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/50 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0 self-center"
               rows={1}
             />
 
@@ -167,7 +167,7 @@ export function Chat() {
               status={status as any}
               disabled={!input.trim() && status !== "streaming"}
               className={cn(
-                "rounded-full size-8 md:size-10 shrink-0 transition-all duration-300",
+                "rounded-full size-8 md:size-10 shrink-0 transition-all duration-300 mb-0.5",
                 input.trim() ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-white/10 text-muted-foreground"
               )}
             >
