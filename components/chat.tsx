@@ -133,8 +133,21 @@ export function Chat() {
               e.preventDefault();
               handleSubmit();
             }}
-            className="relative border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
+            className="flex items-end gap-2 p-1.5 md:p-2 border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl rounded-full overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
           >
+            {/* Deep Think Toggle (Inline) */}
+            <button
+              type="button"
+              onClick={() => setIsDeepThink(!isDeepThink)}
+              className={cn(
+                "flex items-center justify-center size-8 md:size-10 shrink-0 rounded-full transition-all duration-300",
+                isDeepThink
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                  : "bg-white/5 text-muted-foreground hover:bg-white/10"
+              )}
+            >
+              <Brain className={cn("size-4 md:size-5", isDeepThink && "animate-pulse")} />
+            </button>
 
             <PromptInputTextarea
               ref={textareaRef}
@@ -145,43 +158,22 @@ export function Chat() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
-              className="min-h-[44px] md:min-h-[60px] py-3 md:py-5 px-4 md:px-5 text-base bg-transparent placeholder:text-muted-foreground/60 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
+              className="flex-1 min-h-[40px] max-h-[200px] py-2.5 px-2 md:px-4 text-sm md:text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/50 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
+              rows={1}
             />
 
-            <div className="flex items-center justify-between px-3 md:px-4 pb-3 md:pb-4">
-              {/* Deep Think Toggle */}
-              <button
-                type="button"
-                onClick={() => setIsDeepThink(!isDeepThink)}
-                className={cn(
-                  "flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-xs font-medium transition-all duration-300",
-                  isDeepThink
-                    ? "bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10"
-                    : "bg-white/5 text-muted-foreground hover:bg-white/10 border border-transparent"
-                )}
-              >
-                <Brain className={cn("size-3.5 md:size-4", isDeepThink && "animate-pulse")} />
-                <span className="hidden md:inline">Deep Think</span>
-              </button>
-
-              <PromptInputSubmit
-                onClick={handleSubmit}
-                status={status as any}
-                disabled={!input.trim() && status !== "streaming"}
-                className={cn(
-                  "rounded-xl size-8 md:size-10 transition-all duration-300",
-                  input.trim() ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-white/10 text-muted-foreground"
-                )}
-              >
-                <ArrowUp className="size-4 md:size-5" />
-              </PromptInputSubmit>
-            </div>
-
+            <PromptInputSubmit
+              onClick={handleSubmit}
+              status={status as any}
+              disabled={!input.trim() && status !== "streaming"}
+              className={cn(
+                "rounded-full size-8 md:size-10 shrink-0 transition-all duration-300",
+                input.trim() ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-white/10 text-muted-foreground"
+              )}
+            >
+              <ArrowUp className="size-4 md:size-5" />
+            </PromptInputSubmit>
           </PromptInput>
-
-          <div className="text-center text-[10px] text-muted-foreground/40 mt-3 font-mono uppercase tracking-widest">
-            Atmo AI Preview
-          </div>
         </div>
 
       </main>
