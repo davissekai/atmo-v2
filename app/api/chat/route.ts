@@ -1,12 +1,12 @@
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { regularPrompt } from "@/lib/ai/prompts";
+import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages, model: modelId } = body;
+    const { messages, model: modelId, deepThink } = body;
 
     // Validate input
     if (!messages || !Array.isArray(messages)) {
@@ -26,8 +26,18 @@ export async function POST(req: Request) {
 
     const result = streamText({
       model: google(cleanModelId),
-      system: regularPrompt,
+      system: deepThink ? deepThinkPrompt : regularPrompt,
       messages,
+      // Enable thinking mode when Deep Think is on
+      ...(deepThink && {
+        providerOptions: {
+          google: {
+            thinkingConfig: {
+              thinkingLevel: "medium",
+            },
+          },
+        },
+      }),
     });
 
     return new Response(result.textStream, {

@@ -16,6 +16,7 @@ function generateId(): string {
 interface UseSimpleChatProps {
   initialMessages?: SimpleMessage[];
   model?: string;
+  deepThink?: boolean;
   onError?: (error: Error) => void;
 }
 
@@ -28,6 +29,7 @@ interface ChatError {
 export function useSimpleChat({
   initialMessages = [],
   model = DEFAULT_CHAT_MODEL,
+  deepThink = false,
   onError,
 }: UseSimpleChatProps = {}) {
   const [messages, setMessages] = useState<SimpleMessage[]>(initialMessages);
@@ -90,6 +92,7 @@ export function useSimpleChat({
               content: m.content,
             })),
             model,
+            deepThink,
           }),
           signal: abortControllerRef.current.signal,
         });
@@ -186,7 +189,7 @@ export function useSimpleChat({
         abortControllerRef.current = null;
       }
     },
-    [messages, model, onError]
+    [messages, model, deepThink, onError]
   );
 
   const retry = useCallback(() => {
