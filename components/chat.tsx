@@ -82,7 +82,10 @@ export function Chat() {
             {/* Empty State / Hero Section */}
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-start justify-center pb-20 fade-in-0 duration-500 animate-in">
-                <div className="w-full mb-4 md:mb-12">
+                <h2 className="text-xl md:text-3xl font-medium text-muted-foreground/70 leading-tight mb-4 md:mb-8">
+                  What do you want to know about the climate today?
+                </h2>
+                <div className="w-full">
                   <SuggestionCards onSelect={(prompt) => setInput(prompt)} />
                 </div>
               </div>
@@ -149,7 +152,7 @@ export function Chat() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
-              className="flex-1 min-h-[40px] max-h-[200px] py-3 px-2 md:px-4 text-sm md:text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/50 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0 self-center"
+              className="flex-1 min-h-[40px] max-h-[200px] py-3 px-2 md:px-4 text-base leading-relaxed bg-transparent placeholder:text-muted-foreground/50 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0 self-center"
               rows={1}
             />
 
