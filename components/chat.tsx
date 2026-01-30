@@ -127,14 +127,14 @@ export function Chat() {
               e.preventDefault();
               handleSubmit();
             }}
-            className="flex items-end gap-2 p-1.5 md:p-2 border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl rounded-[26px] overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
+            className="flex items-center gap-2 p-1.5 md:p-2 border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl rounded-[26px] overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
           >
             {/* Deep Think Toggle (Inline) */}
             <button
               type="button"
               onClick={() => setIsDeepThink(!isDeepThink)}
               className={cn(
-                "flex items-center justify-center size-8 md:size-10 shrink-0 rounded-full transition-all duration-300 mb-0.5",
+                "flex items-center justify-center size-8 md:size-10 shrink-0 rounded-full transition-all duration-300",
                 isDeepThink
                   ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                   : "bg-white/5 text-muted-foreground hover:bg-white/10"
@@ -160,7 +160,7 @@ export function Chat() {
               status={status as any}
               disabled={!input.trim() && status !== "streaming"}
               className={cn(
-                "rounded-full size-8 md:size-10 shrink-0 transition-all duration-300 mb-0.5",
+                "rounded-full size-8 md:size-10 shrink-0 transition-all duration-300",
                 input.trim() ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-white/10 text-muted-foreground"
               )}
             >

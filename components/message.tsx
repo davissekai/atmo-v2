@@ -25,19 +25,22 @@ export function Message({ message }: { message: SimpleUIMessage }) {
         )}
       </div>
 
-      <div className={cn("flex flex-col gap-1 min-w-0 max-w-[85%]", isUser ? "items-end" : "items-start")}>
+      <div className={cn(
+        "flex flex-col gap-1 min-w-0 overflow-hidden",
+        isUser ? "items-end max-w-[85%]" : "items-start flex-1"
+      )}>
         <div className={cn(
-          "rounded-2xl md:rounded-3xl px-3 md:px-4 py-1.5 md:py-2.5 text-sm",
+          "text-sm overflow-hidden",
           isUser
-            ? "bg-primary text-primary-foreground rounded-tr-none md:rounded-tr-none"
-            : "bg-muted text-foreground rounded-tl-none md:rounded-tl-none"
+            ? "bg-primary text-primary-foreground rounded-2xl md:rounded-3xl px-3 md:px-4 py-1.5 md:py-2.5 rounded-tr-none"
+            : "text-foreground w-full"
         )}>
           {message.parts.map((part, index) => (
-            <div key={index} className="break-words">
+            <div key={index} className="break-words overflow-wrap-anywhere">
               {isUser ? (
                 <span className="whitespace-pre-wrap leading-relaxed">{part.text}</span>
               ) : (
-                <div className="prose prose-xs md:prose-sm dark:prose-invert max-w-none prose-p:my-2 md:prose-p:my-3 prose-headings:my-3 md:prose-headings:my-4 prose-ul:my-2 md:prose-ul:my-3 prose-ol:my-2 md:prose-ol:my-3 prose-li:my-0.5 md:prose-li:my-1 prose-table:my-3 md:prose-table:my-4 prose-th:border prose-th:border-border prose-th:px-2 md:prose-th:px-3 prose-th:py-1 md:prose-th:py-2 prose-th:bg-muted prose-td:border prose-td:border-border prose-td:px-2 md:prose-td:px-3 prose-td:py-1 md:prose-td:py-2">
+                <div className="prose prose-sm dark:prose-invert max-w-full prose-p:my-2 prose-headings:my-3 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 prose-table:my-3 prose-th:border prose-th:border-border prose-th:px-2 prose-th:py-1 prose-th:bg-muted prose-td:border prose-td:border-border prose-td:px-2 prose-td:py-1 [word-break:break-word] [overflow-wrap:break-word]">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{part.text}</ReactMarkdown>
                 </div>
               )}
