@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* include plugins */
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
+
+/* define design tokens (light mode) */
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(240 10% 3.9%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(240 10% 3.9%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(240 10% 3.9%);
+  --primary: #40902e;
+  /* Stitch Green */
+  --primary-foreground: #ffffff;
+  --secondary: hsl(240 4.8% 95.9%);
+  --secondary-foreground: hsl(240 5.9% 10%);
+  --muted: hsl(240 4.8% 95.9%);
+  --muted-foreground: hsl(240 3.8% 46.1%);
+  --accent: hsl(240 4.8% 95.9%);
+  --accent-foreground: hsl(240 5.9% 10%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: hsl(240 5.9% 90%);
+  --input: hsl(240 5.9% 90%);
+  --ring: #40902e;
+  --radius: 0.5rem;
+  --sidebar: hsl(0 0% 98%);
+
+  --font-space: "Space Grotesk", sans-serif;
+}
+
+/* define design tokens (dark mode) */
+.dark {
+  --background: #0A100D;
+  /* Deep black base */
+  --foreground: hsl(0 0% 98%);
+  --card: #161e14;
+  /* Solid dark card instead of glass */
+  --card-foreground: hsl(0 0% 98%);
+  --popover: #161e14;
+  --popover-foreground: hsl(0 0% 98%);
+  --primary: #40902e;
+  --primary-foreground: #ffffff;
+  --secondary: #1a2e1a;
+  --secondary-foreground: hsl(0 0% 98%);
+  --muted: #1a2e1a;
+  --muted-foreground: #a0bba0;
+  --accent: #1a2e1a;
+  --accent-foreground: hsl(0 0% 98%);
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(0 0% 98%);
+  --border: #2a3e2a;
+  --input: #2a3e2a;
+  --ring: #40902e;
+  --sidebar: #050806;
+  /* Slightly darker than bg */
+}
+
+/* define theme */
+@theme {
+  --font-sans: var(--font-space);
+  /* Use Space Grotesk as default sans */
+  --font-mono: var(--font-geist-mono);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-sidebar: var(--sidebar);
+}
+
+@layer base {
+
+  *,
+  ::before,
+  ::after {
+    border-color: transparent;
+    /* Prevent unintended borders */
+  }
+
+  *:where([class*="border"]) {
+    border-color: var(--border);
+  }
+
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-space);
+  }
+}
+
+@layer utilities {
+  .bg-stitch-gradient {
+    /* Radial gradient from visual mock */
+    background: radial-gradient(circle at top right, #1a2e1a 0%, #0A100D 60%);
+  }
+}
