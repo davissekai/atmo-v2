@@ -81,8 +81,8 @@ export function Chat() {
 
             {/* Empty State / Hero Section */}
             {messages.length === 0 && (
-              <div className="flex-1 flex flex-col items-center justify-center pb-20 fade-in-0 duration-500 animate-in">
-                <h2 className="text-xl md:text-3xl font-medium text-muted-foreground/70 leading-tight mb-4 md:mb-8 text-center px-4">
+              <div className="flex-1 flex flex-col items-start justify-center pt-24 md:pt-32 pb-20 fade-in-0 duration-500 animate-in">
+                <h2 className="text-xl md:text-3xl font-medium text-muted-foreground/70 leading-tight mb-4 md:mb-8">
                   What do you want to know about the climate today?
                 </h2>
                 <div className="w-full max-w-lg">

@@ -3,6 +3,9 @@ import { google } from "@ai-sdk/google";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 
+// Use Edge runtime for reliable streaming on Vercel
+export const runtime = "edge";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -24,7 +27,7 @@ export async function POST(req: Request) {
       ? providerModel.replace("google/", "")
       : providerModel;
 
-    const result = await streamText({
+    const result = streamText({
       model: google(cleanModelId),
       system: deepThink ? deepThinkPrompt : regularPrompt,
       messages,
@@ -70,3 +73,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
