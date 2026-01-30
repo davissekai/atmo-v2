@@ -82,15 +82,6 @@ export function Chat() {
             {/* Empty State / Hero Section */}
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-start justify-center pb-20 fade-in-0 duration-500 animate-in">
-                <div className="mb-8 md:mb-12 space-y-1 md:space-y-2">
-                  <h1 className="text-2xl md:text-5xl font-medium tracking-tight">
-                    Greetings! <span className="text-muted-foreground"></span>
-                  </h1>
-                  <h2 className="text-2xl md:text-5xl font-medium text-muted-foreground/60 leading-tight">
-                    What do you want to know about the climate today?
-                  </h2>
-                </div>
-
                 <div className="w-full mb-4 md:mb-12">
                   <SuggestionCards onSelect={(prompt) => setInput(prompt)} />
                 </div>
@@ -163,7 +154,6 @@ export function Chat() {
             />
 
             <PromptInputSubmit
-              onClick={handleSubmit}
               status={status as any}
               disabled={!input.trim() && status !== "streaming"}
               className={cn(
