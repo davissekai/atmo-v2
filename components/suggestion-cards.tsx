@@ -29,17 +29,17 @@ export function SuggestionCards({ onSelect }: { onSelect: (prompt: string) => vo
     ];
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl">
+        <div className="grid grid-cols-1 gap-2 md:gap-4 w-full max-w-4xl">
             {cards.map((card, index) => (
                 <button
                     key={index}
                     onClick={() => onSelect(card.prompt)}
-                    className="group flex flex-col items-start p-6 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 text-left shadow-lg backdrop-blur-sm"
+                    className="group flex flex-col items-start p-3 md:p-6 rounded-xl md:rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all duration-300 text-left shadow-lg backdrop-blur-sm"
                 >
-                    <h3 className="text-lg font-medium text-foreground mb-2 font-sans tracking-tight">
+                    <h3 className="text-sm md:text-lg font-medium text-foreground mb-0.5 md:mb-2 font-sans tracking-tight">
                         {card.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground/80 leading-relaxed font-light">
+                    <p className="text-xs md:text-sm text-muted-foreground/80 leading-relaxed font-light">
                         {card.description}
                     </p>
                 </button>

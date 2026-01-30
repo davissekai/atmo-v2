@@ -82,11 +82,11 @@ export function Chat() {
             {/* Empty State / Hero Section */}
             {messages.length === 0 && (
               <div className="flex-1 flex flex-col items-start justify-center pb-20 fade-in-0 duration-500 animate-in">
-                <div className="mb-12 space-y-2">
-                  <h1 className="text-4xl md:text-5xl font-medium tracking-tight">
+                <div className="mb-8 md:mb-12 space-y-1 md:space-y-2">
+                  <h1 className="text-2xl md:text-5xl font-medium tracking-tight">
                     Greetings! <span className="text-muted-foreground"></span>
                   </h1>
-                  <h2 className="text-4xl md:text-5xl font-medium text-muted-foreground/60">
+                  <h2 className="text-2xl md:text-5xl font-medium text-muted-foreground/60 leading-tight">
                     What do you want to know about the climate today?
                   </h2>
                 </div>
@@ -127,7 +127,7 @@ export function Chat() {
         </div>
 
         {/* Input Area (Floating) */}
-        <div className="p-4 md:p-6 w-full max-w-4xl mx-auto z-20">
+        <div className="p-2 md:p-6 w-full max-w-4xl mx-auto z-20">
           <PromptInput
             onSubmit={(e) => {
               e.preventDefault();
@@ -145,23 +145,23 @@ export function Chat() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
-              className="min-h-[60px] max-h-[200px] py-5 px-5 text-base bg-transparent placeholder:text-muted-foreground/60 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
+              className="min-h-[44px] md:min-h-[60px] py-3 md:py-5 px-4 md:px-5 text-base bg-transparent placeholder:text-muted-foreground/60 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
             />
 
-            <div className="flex items-center justify-between px-4 pb-4">
+            <div className="flex items-center justify-between px-3 md:px-4 pb-3 md:pb-4">
               {/* Deep Think Toggle */}
               <button
                 type="button"
                 onClick={() => setIsDeepThink(!isDeepThink)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300",
+                  "flex items-center gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-lg text-xs font-medium transition-all duration-300",
                   isDeepThink
                     ? "bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10"
                     : "bg-white/5 text-muted-foreground hover:bg-white/10 border border-transparent"
                 )}
               >
-                <Brain className={cn("size-4", isDeepThink && "animate-pulse")} />
-                <span>Deep Think</span>
+                <Brain className={cn("size-3.5 md:size-4", isDeepThink && "animate-pulse")} />
+                <span className="hidden md:inline">Deep Think</span>
               </button>
 
               <PromptInputSubmit
@@ -169,11 +169,11 @@ export function Chat() {
                 status={status as any}
                 disabled={!input.trim() && status !== "streaming"}
                 className={cn(
-                  "rounded-xl size-10 transition-all duration-300",
+                  "rounded-xl size-8 md:size-10 transition-all duration-300",
                   input.trim() ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-white/10 text-muted-foreground"
                 )}
               >
-                <ArrowUp className="size-5" />
+                <ArrowUp className="size-4 md:size-5" />
               </PromptInputSubmit>
             </div>
 
