@@ -13,11 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SuggestionCards } from "@/components/suggestion-cards";
-import { Paperclip, ArrowUp } from "lucide-react";
+import { Paperclip, ArrowUp, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Chat() {
-  const { messages, status, error, clearError, sendMessage, stop, retry } = useSimpleChat();
+  const [isDeepThink, setIsDeepThink] = useState(false);
+  const { messages, status, error, clearError, sendMessage, stop, retry } = useSimpleChat({ deepThink: isDeepThink });
   const [input, setInput] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -127,7 +128,13 @@ export function Chat() {
 
         {/* Input Area (Floating) */}
         <div className="p-4 md:p-6 w-full max-w-4xl mx-auto z-20">
-          <PromptInput className="relative border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300">
+          <PromptInput
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="relative border border-white/5 bg-white/5 backdrop-blur-xl shadow-2xl rounded-2xl overflow-hidden focus-within:ring-1 focus-within:ring-primary/50 transition-all duration-300"
+          >
 
             <PromptInputTextarea
               ref={textareaRef}
@@ -141,7 +148,22 @@ export function Chat() {
               className="min-h-[60px] max-h-[200px] py-5 px-5 text-base bg-transparent placeholder:text-muted-foreground/60 resize-none !border-none !shadow-none !ring-0 focus-visible:ring-0"
             />
 
-            <div className="flex items-center justify-end px-4 pb-4">
+            <div className="flex items-center justify-between px-4 pb-4">
+              {/* Deep Think Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsDeepThink(!isDeepThink)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-300",
+                  isDeepThink
+                    ? "bg-primary/20 text-primary border border-primary/30 shadow-lg shadow-primary/10"
+                    : "bg-white/5 text-muted-foreground hover:bg-white/10 border border-transparent"
+                )}
+              >
+                <Brain className={cn("size-4", isDeepThink && "animate-pulse")} />
+                <span>Deep Think</span>
+              </button>
+
               <PromptInputSubmit
                 onClick={handleSubmit}
                 status={status as any}
