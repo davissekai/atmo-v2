@@ -9,6 +9,11 @@ out/
 build/
 dist/
 
+# Context & meta files (not part of codebase)
+SESSION_CONTEXT.md
+assess_report.md
+stitch_atmo_dashboard/
+
 # Environment files (NEVER commit these)
 .env
 .env.local
