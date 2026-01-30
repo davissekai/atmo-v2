@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       ? providerModel.replace("google/", "")
       : providerModel;
 
-    const result = streamText({
+    const result = await streamText({
       model: google(cleanModelId),
       system: deepThink ? deepThinkPrompt : regularPrompt,
       messages,
@@ -40,11 +40,7 @@ export async function POST(req: Request) {
       }),
     });
 
-    return new Response(result.textStream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-      },
-    });
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
 
