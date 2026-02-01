@@ -27,7 +27,8 @@ export default function MissionPage() {
                         for the planet.
                     </h1>
                     <p className="text-xl text-white/60 max-w-2xl leading-relaxed">
-                        Savoir isn't just for climate action. Atmo exists to bridge the gap between data and action.
+                        Climate change is the defining challenge of our time, but understanding it shouldn't be.
+                        Atmo bridges the gap between complex science and public action, building the climate literacy we need to truly advocate for our planet.
                     </p>
                 </div>
 
