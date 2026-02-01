@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Megaphone, BookOpen, Eye } from "lucide-react";
 
@@ -26,8 +27,7 @@ export default function MissionPage() {
                         for the planet.
                     </h1>
                     <p className="text-xl text-white/60 max-w-2xl leading-relaxed">
-                        Climate change isn't just a science problem. It's a communication problem.
-                        Savoir exists to bridge the gap between data and action.
+                        Savoir isn't just for climate action. Atmo exists to bridge the gap between data and action.
                     </p>
                 </div>
 
@@ -69,8 +69,22 @@ export default function MissionPage() {
 
                 </div>
 
+                {/* SDG Commitment */}
+                <div className="mt-24 text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+                    <h2 className="text-xs text-white/30 font-medium tracking-[0.2em] uppercase">Aligned With Global Goals</h2>
+                    <div className="flex justify-center">
+                        <Image
+                            src="/sdg-13-atmo.png"
+                            alt="SDG 13 Climate Action - Atmo Style"
+                            width={180}
+                            height={180}
+                            className="opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                    </div>
+                </div>
+
                 {/* Footer / Connect */}
-                <div className="mt-32 p-8 rounded-3xl bg-white/5 border border-white/10 text-center space-y-6">
+                <div className="mt-24 p-8 rounded-3xl bg-white/5 border border-white/10 text-center space-y-6">
                     <h2 className="text-2xl font-light">The first step is conversation.</h2>
                     <Link href="/chat">
                         <Button className="rounded-full bg-[#40902e] hover:bg-[#367a26] text-white px-8">
