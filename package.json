@@ -25,6 +25,7 @@
     "@radix-ui/react-tooltip": "^1.x",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.19",
+    "@vercel/analytics": "^1.6.1",
     "ai": "^4.x",
     "class-variance-authority": "^0.x",
     "clsx": "^2.x",
