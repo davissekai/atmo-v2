@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
     title: "Atmo - Climate Assistant",
@@ -18,7 +17,7 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
             </head>
-            <body className="antialiased h-screen w-screen overflow-hidden bg-background text-foreground">
+            <body className="antialiased bg-background text-foreground">
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -27,7 +26,6 @@ export default function RootLayout({
                 >
                     {children}
                 </ThemeProvider>
-                <Analytics />
             </body>
         </html>
     );

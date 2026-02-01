@@ -3,8 +3,8 @@ import { google } from "@ai-sdk/google";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 
-// Use Edge runtime for reliable streaming on Vercel
-export const runtime = "edge";
+// TEMP: Disabled Edge runtime for local debugging
+// export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
@@ -27,6 +27,10 @@ export async function POST(req: Request) {
       ? providerModel.replace("google/", "")
       : providerModel;
 
+    console.log("API Route: Starting streamText with model:", cleanModelId);
+    console.log("API Route: Messages:", JSON.stringify(messages));
+    console.log("API Route: DeepThink:", deepThink);
+
     const result = streamText({
       model: google(cleanModelId),
       system: deepThink ? deepThinkPrompt : regularPrompt,
@@ -41,36 +45,36 @@ export async function POST(req: Request) {
           },
         },
       }),
+      onFinish: ({ text, finishReason, usage }) => {
+        console.log("API Route: Stream finished");
+        console.log("API Route: Finish reason:", finishReason);
+        console.log("API Route: Text length:", text?.length || 0);
+        console.log("API Route: Usage:", JSON.stringify(usage));
+      },
     });
 
-    return result.toTextStreamResponse();
+    // Log any streaming errors asynchronously (doesn't block the response)
+    result.text.catch(err => {
+      console.error("API Route: Stream error:", err);
+    });
+
+    console.log("API Route: streamText returned, forwarding to toDataStreamResponse");
+
+    return result.toDataStreamResponse({
+      getErrorMessage: (error) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes("rate") || errorMessage.includes("quota") || errorMessage.includes("429")) {
+          return "Rate limit exceeded. Please try again later.";
+        }
+        return "An internal error occurred.";
+      }
+    });
+
   } catch (error) {
     console.error("Chat API error:", error);
-
-    // Check for specific error types
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-    // API key issues
-    if (errorMessage.includes("API key") || errorMessage.includes("authentication")) {
-      return new Response(
-        JSON.stringify({ error: "API configuration error. Please check your API key." }),
-        { status: 503, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Rate limit
-    if (errorMessage.includes("rate") || errorMessage.includes("quota")) {
-      return new Response(
-        JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }),
-        { status: 429, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Generic server error
     return new Response(
-      JSON.stringify({ error: "Something went wrong. Please try again." }),
+      JSON.stringify({ error: "An unexpected error occurred." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
-

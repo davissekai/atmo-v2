@@ -132,26 +132,48 @@ export function useSimpleChat({
         // Read the stream
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let accumulatedText = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
-          accumulatedText += chunk;
 
-          // Update the assistant message with accumulated text
-          setMessages((prev) => {
-            const lastMessage = prev[prev.length - 1];
-            if (lastMessage && lastMessage.role === "assistant") {
-              return [
-                ...prev.slice(0, -1),
-                { ...lastMessage, content: accumulatedText },
-              ];
+          // Parse data stream protocol (simplified)
+          // Format: type:"content"\n
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (!line) continue;
+
+            // Text part
+            if (line.startsWith('0:')) {
+              try {
+                const textContent = JSON.parse(line.substring(2));
+                setMessages((prev) => {
+                  const lastMessage = prev[prev.length - 1];
+                  if (lastMessage && lastMessage.role === "assistant") {
+                    return [
+                      ...prev.slice(0, -1),
+                      { ...lastMessage, content: (lastMessage.content || "") + textContent },
+                    ];
+                  }
+                  return prev;
+                });
+              } catch (e) {
+                console.error("Error parsing stream chunk:", e);
+              }
             }
-            return prev;
-          });
+            // Error part
+            else if (line.startsWith('3:')) {
+              try {
+                const errorContent = JSON.parse(line.substring(2));
+                throw { message: errorContent, retryable: true } as ChatError;
+              } catch (e) {
+                if ((e as ChatError).message) throw e;
+              }
+            }
+          }
         }
 
         setStatus("ready");
