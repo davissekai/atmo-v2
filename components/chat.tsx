@@ -25,10 +25,17 @@ export function Chat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom only when new messages appear
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, status]);
+  }, [messages.length]);
+
+  // Also scroll when thinking mode starts
+  useEffect(() => {
+    if (status === "streaming") {
+      endRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [status]);
 
   // Adjust textarea height
   const adjustHeight = () => {
