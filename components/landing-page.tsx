@@ -50,9 +50,11 @@ export function LandingPage() {
                                 Start the Conversation
                             </Button>
                         </Link>
-                        <Button variant="ghost" size="lg" className="rounded-full h-14 px-8 text-lg text-white/70 hover:text-white hover:bg-white/5">
-                            Read Our Mission
-                        </Button>
+                        <Link href="/mission">
+                            <Button variant="ghost" size="lg" className="rounded-full h-14 px-8 text-lg text-white/70 hover:text-white hover:bg-white/5">
+                                Read Our Mission
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 
