@@ -108,8 +108,9 @@ export function LandingPage() {
                                 <span className="text-xs font-medium uppercase tracking-wider text-white/50">Live Status</span>
                             </div>
                             <div>
-                                <div className="text-4xl font-light mb-1">1.2°C</div>
+                                <div className="text-4xl font-light mb-1">~1.5°C</div>
                                 <div className="text-sm text-white/40">Warming above pre-industrial levels</div>
+                                <div className="text-[10px] text-white/20 mt-2 uppercase tracking-widest">Source: Copernicus 2024</div>
                             </div>
                         </div>
 
@@ -117,10 +118,48 @@ export function LandingPage() {
                         <div className="md:col-span-2 relative overflow-hidden rounded-3xl bg-white/5 border border-white/10 p-10 hover:border-white/20 transition-colors bg-gradient-to-br from-white/5 to-transparent">
                             <h3 className="text-2xl font-medium mb-3">Global Edge Network</h3>
                             <p className="text-white/60 max-w-lg leading-relaxed">
-                                Atmo lives on the Edge. No latency, no loading. Just instant access to climate insights, wherever you are in the world.
+                                Atmo lives on the Edge. Optimized for speed and accessibility. Just instant access to climate insights, wherever you are in the world.
                             </p>
                         </div>
 
+                    </div>
+                </div>
+            </section>
+
+            {/* Example Prompts Section */}
+            <section className="py-24 px-6 border-t border-white/5 bg-[#0A100D]">
+                <div className="max-w-4xl mx-auto text-center space-y-12">
+                    <div className="space-y-4">
+                        <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-white/90">Build your Climate Intelligence.</h2>
+                        <p className="text-lg text-white/50 max-w-2xl mx-auto">
+                            From definitions to deep dives, Atmo helps you understand the language of our changing planet.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                        {/* Prompt 1 */}
+                        <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#40902e]/50 hover:bg-white/[0.07] transition-all cursor-default">
+                            <div className="text-[#40902e] text-sm font-medium mb-3 tracking-wide uppercase">Foundational</div>
+                            <p className="text-lg text-white/80 leading-snug group-hover:text-white transition-colors">
+                                "What is Greenhouse Gas mitigation, and how does it actually work?"
+                            </p>
+                        </div>
+
+                        {/* Prompt 2 */}
+                        <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#40902e]/50 hover:bg-white/[0.07] transition-all cursor-default">
+                            <div className="text-[#40902e] text-sm font-medium mb-3 tracking-wide uppercase">Concepts</div>
+                            <p className="text-lg text-white/80 leading-snug group-hover:text-white transition-colors">
+                                "What is the difference between 'Net Zero' and 'Carbon Neutral'?"
+                            </p>
+                        </div>
+
+                        {/* Prompt 3 */}
+                        <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#40902e]/50 hover:bg-white/[0.07] transition-all cursor-default">
+                            <div className="text-[#40902e] text-sm font-medium mb-3 tracking-wide uppercase">Context</div>
+                            <p className="text-lg text-white/80 leading-snug group-hover:text-white transition-colors">
+                                "Why is '1.5 degrees' considered the critical limit for warming?"
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
