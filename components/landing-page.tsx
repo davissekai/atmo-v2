@@ -161,6 +161,14 @@ export function LandingPage() {
                             </p>
                         </div>
                     </div>
+
+                    <div className="pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                        <Link href="/chat">
+                            <Button size="lg" className="rounded-full h-14 px-10 text-lg bg-[#40902e] hover:bg-[#367a26] text-white transition-all duration-300 hover:scale-105 shadow-2xl shadow-[#40902e]/20">
+                                Ask Atmo <ArrowRight className="ml-2 size-5" />
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </section>
 
