@@ -1,5 +1,5 @@
-// Curated list of top models from Vercel AI Gateway
-export const DEFAULT_CHAT_MODEL = "google/gemini-3-flash-preview";
+// Curated list of top models
+export const DEFAULT_CHAT_MODEL = "stepfun/step-3.5-flash:free";
 
 export type ChatModel = {
   id: string;
@@ -9,6 +9,13 @@ export type ChatModel = {
 };
 
 export const chatModels: ChatModel[] = [
+  // OpenRouter (Fastest)
+  {
+    id: "stepfun/step-3.5-flash:free",
+    name: "StepFun 3.5 Flash",
+    provider: "openrouter",
+    description: "Ultra-fast response times via OpenRouter",
+  },
   // Google
   {
     id: "google/gemini-3-flash-preview",

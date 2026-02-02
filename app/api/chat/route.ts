@@ -1,18 +1,17 @@
-import { streamText } from "ai";
-import { google } from "@ai-sdk/google";
-import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 import { getCacheKey, getCachedResponse, setCachedResponse } from "@/lib/ai/cache";
 
-// TEMP: Disabled Edge runtime for local debugging
-// export const runtime = "edge";
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL_ID = "stepfun/step-3.5-flash:free";
 
 export async function POST(req: Request) {
+  console.log("API Route: Using OpenRouter with model:", MODEL_ID);
+  const startTime = Date.now();
+
   try {
     const body = await req.json();
-    const { messages, model: modelId, deepThink } = body;
+    const { messages, deepThink } = body;
 
-    // Validate input
     if (!messages || !Array.isArray(messages)) {
       return new Response(
         JSON.stringify({ error: "Invalid request: messages array required" }),
@@ -20,32 +19,22 @@ export async function POST(req: Request) {
       );
     }
 
-    // Use provided model or default to Gemini 3 Flash
-    const providerModel = modelId || DEFAULT_CHAT_MODEL;
-
-    // Strip provider prefix for the google() factory
-    const cleanModelId = providerModel.startsWith("google/")
-      ? providerModel.replace("google/", "")
-      : providerModel;
-
     // Get the last user message for cache key
     const lastUserMessage = messages.filter((m: { role: string }) => m.role === "user").pop();
     const userQuery = lastUserMessage?.content || "";
 
-    // Only cache single-message queries (not conversations) and non-deepThink
+    // Only cache single-message queries
     const isCacheable = messages.length === 1 && !deepThink && userQuery.length > 0;
 
     if (isCacheable) {
-      const cacheKey = getCacheKey(cleanModelId, userQuery);
+      const cacheKey = getCacheKey(MODEL_ID, userQuery);
       const cachedResponse = getCachedResponse(cacheKey);
 
       if (cachedResponse) {
-        console.log("API Route: Cache HIT - returning cached response");
-        // Return cached response as a simple stream
+        console.log("API Route: Cache HIT");
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
           start(controller) {
-            // Send the cached text as a data stream chunk
             controller.enqueue(encoder.encode(`0:${JSON.stringify(cachedResponse)}\n`));
             controller.enqueue(encoder.encode(`e:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0},"isContinued":false}\n`));
             controller.enqueue(encoder.encode(`d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`));
@@ -63,56 +52,91 @@ export async function POST(req: Request) {
       }
     }
 
-    console.log("API Route: Starting streamText with model:", cleanModelId);
-    console.log("API Route: Messages:", JSON.stringify(messages));
-    console.log("API Route: DeepThink:", deepThink);
+    // Build messages with system prompt
+    const systemPrompt = deepThink ? deepThinkPrompt : regularPrompt;
+    const allMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages
+    ];
 
-    // Accumulate the full response for caching
+    console.log("API Route: Calling OpenRouter...");
+
+    // Direct fetch to OpenRouter
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://atmo-v2.vercel.app",
+        "X-Title": "Atmo Climate Assistant",
+      },
+      body: JSON.stringify({
+        model: MODEL_ID,
+        messages: allMessages,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("OpenRouter error:", response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: `OpenRouter error: ${response.status}` }),
+        { status: response.status, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Stream the response back to client
+    const encoder = new TextEncoder();
     let fullResponse = "";
 
-    const result = streamText({
-      model: google(cleanModelId),
-      system: deepThink ? deepThinkPrompt : regularPrompt,
-      messages,
-      // Enable thinking mode when Deep Think is on
-      ...(deepThink && {
-        providerOptions: {
-          google: {
-            thinkingConfig: {
-              thinkingLevel: "medium",
-            },
-          },
-        },
-      }),
-      onFinish: ({ text, finishReason, usage }) => {
-        console.log("API Route: Stream finished");
-        console.log("API Route: Finish reason:", finishReason);
-        console.log("API Route: Text length:", text?.length || 0);
-        console.log("API Route: Usage:", JSON.stringify(usage));
+    const transformStream = new TransformStream({
+      async transform(chunk, controller) {
+        const text = new TextDecoder().decode(chunk);
+        const lines = text.split("\n").filter(line => line.trim() !== "");
 
-        // Cache the response if it was cacheable
-        if (isCacheable && text) {
-          const cacheKey = getCacheKey(cleanModelId, userQuery);
-          setCachedResponse(cacheKey, text);
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6);
+            if (data === "[DONE]") {
+              // Stream finished
+              const duration = Date.now() - startTime;
+              console.log("API Route: Response completed in", duration, "ms");
+              console.log("API Route: Text length:", fullResponse.length);
+
+              // Cache if applicable
+              if (isCacheable && fullResponse) {
+                const cacheKey = getCacheKey(MODEL_ID, userQuery);
+                setCachedResponse(cacheKey, fullResponse);
+              }
+
+              // Send finish events
+              controller.enqueue(encoder.encode(`e:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0},"isContinued":false}\n`));
+              controller.enqueue(encoder.encode(`d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`));
+              continue;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                fullResponse += content;
+                // Send as Vercel AI data stream format
+                controller.enqueue(encoder.encode(`0:${JSON.stringify(content)}\n`));
+              }
+            } catch (e) {
+              // Skip unparseable chunks
+            }
+          }
         }
-      },
-    });
-
-    // Log any streaming errors asynchronously (doesn't block the response)
-    result.text.catch(err => {
-      console.error("API Route: Stream error:", err);
-    });
-
-    console.log("API Route: streamText returned, forwarding to toDataStreamResponse");
-
-    return result.toDataStreamResponse({
-      getErrorMessage: (error) => {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        if (errorMessage.includes("rate") || errorMessage.includes("quota") || errorMessage.includes("429")) {
-          return "Rate limit exceeded. Please try again later.";
-        }
-        return "An internal error occurred.";
       }
+    });
+
+    return new Response(response.body?.pipeThrough(transformStream), {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "x-vercel-ai-data-stream": "v1",
+      },
     });
 
   } catch (error) {
@@ -123,4 +147,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
