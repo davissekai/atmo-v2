@@ -119,5 +119,4 @@ export default function LinkGeneratorPage() {
             </div>
         </div>
     );
-    );
 }
