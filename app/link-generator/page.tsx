@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, ExternalLink } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 export default function LinkGeneratorPage() {
     const [term, setTerm] = useState("");
@@ -38,10 +38,7 @@ export default function LinkGeneratorPage() {
         }
     };
 
-    const testLink = () => {
-        if (!generatedLink) return;
-        window.open(generatedLink.replace("https://atmo-v2.vercel.app", "http://localhost:3000"), "_blank");
-    };
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
@@ -87,7 +84,7 @@ export default function LinkGeneratorPage() {
                                 type="text"
                                 value={generatedLink}
                                 readOnly
-                                className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-emerald-400 font-mono text-sm focus:outline-none"
+                                className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white/80 font-mono text-sm focus:outline-none"
                             />
                             <Button
                                 onClick={copyToClipboard}
@@ -103,16 +100,6 @@ export default function LinkGeneratorPage() {
                                 ✓ Copied to clipboard!
                             </p>
                         )}
-
-                        {/* Test Link Button */}
-                        <Button
-                            onClick={testLink}
-                            variant="ghost"
-                            className="mt-4 text-slate-400 hover:text-white"
-                        >
-                            <ExternalLink className="size-4 mr-2" />
-                            Test Link (localhost)
-                        </Button>
                     </div>
                 )}
 
