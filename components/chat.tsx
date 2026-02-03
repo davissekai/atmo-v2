@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSimpleChat } from "@/hooks/use-simple-chat";
 import { Message, ThinkingMessage } from "@/components/message";
 import { toUIMessage } from "@/lib/simple-chat-types";
@@ -17,13 +18,27 @@ import { Paperclip, ArrowUp, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Chat() {
+  const searchParams = useSearchParams();
   const [isDeepThink, setIsDeepThink] = useState(false);
   const { messages, status, error, clearError, sendMessage, stop, retry } = useSimpleChat({ deepThink: isDeepThink });
   const [input, setInput] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [hasProcessedDeepLink, setHasProcessedDeepLink] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  // Handle deep link prompt from URL (?prompt=...)
+  useEffect(() => {
+    if (hasProcessedDeepLink) return;
+
+    const promptParam = searchParams.get("prompt");
+    if (promptParam && promptParam.trim()) {
+      // Auto-send the prompt from the URL
+      sendMessage(promptParam.trim());
+      setHasProcessedDeepLink(true);
+    }
+  }, [searchParams, hasProcessedDeepLink, sendMessage]);
 
   // Auto-scroll to bottom only when new messages appear
   useEffect(() => {
