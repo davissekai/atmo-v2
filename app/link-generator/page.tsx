@@ -41,79 +41,84 @@ export default function LinkGeneratorPage() {
 
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-8">
-            <div className="max-w-2xl mx-auto">
+    return (
+        <div className="min-h-screen bg-[#0A100D] text-white font-sans selection:bg-[#40902e] selection:text-white p-6 md:p-12 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#40902e] rounded-full blur-[180px] opacity-10 pointer-events-none" />
+
+            {/* Navbar / Logo */}
+            <div className="absolute top-6 left-6 flex items-center gap-2 z-20">
+                <Globe className="size-6 text-[#40902e]" />
+                <span className="text-xl font-medium tracking-tight">Atmo</span>
+            </div>
+
+            <div className="max-w-2xl mx-auto relative z-10 pt-16">
                 {/* Header */}
-                <div className="mb-12">
-                    <h1 className="text-3xl font-bold mb-2">ACC Climate Dictionary Link Generator</h1>
-                    <p className="text-slate-400">
-                        Generate shareable links that open Atmo with a Climate Dictionary term pre-loaded.
+                <div className="mb-12 text-center space-y-4">
+                    <h1 className="text-4xl md:text-5xl font-medium tracking-tight">Climate Dictionary <br /> <span className="text-[#40902e]">Link Generator</span></h1>
+                    <p className="text-lg text-white/50 max-w-lg mx-auto">
+                        Create deep links for the ACC Climate Dictionary series.
                     </p>
                 </div>
 
                 {/* Input Section */}
-                <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 mb-6">
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
+                <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-3xl p-8 mb-6 shadow-2xl shadow-black/50">
+                    <label className="block text-sm font-medium text-white/70 mb-3 tracking-wide uppercase text-xs">
                         Climate Dictionary Term
                     </label>
                     <input
                         type="text"
                         value={term}
                         onChange={(e) => setTerm(e.target.value)}
-                        placeholder="e.g., Climate Resilience"
-                        className="w-full px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-lg"
+                        placeholder="e.g., Maladaptation"
+                        className="w-full px-5 py-4 bg-black/20 border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-1 focus:ring-[#40902e] focus:border-[#40902e] text-lg transition-all"
                         onKeyDown={(e) => e.key === "Enter" && generateLink()}
                     />
                     <Button
                         onClick={generateLink}
                         disabled={!term.trim()}
-                        className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition-colors"
+                        className="mt-6 w-full h-14 bg-[#40902e] hover:bg-[#367a26] text-white font-medium text-lg rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-[#40902e]/20"
                     >
-                        Generate Link
+                        Generate Deep Link
                     </Button>
                 </div>
 
                 {/* Output Section */}
                 {generatedLink && (
-                    <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 animate-in fade-in-0 slide-in-from-bottom-4 duration-300">
-                        <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-3xl p-8 animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
+                        <label className="block text-sm font-medium text-white/70 mb-3 tracking-wide uppercase text-xs">
                             Shareable Link
                         </label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                             <input
                                 type="text"
                                 value={generatedLink}
                                 readOnly
-                                className="flex-1 px-4 py-3 bg-slate-900 border border-slate-600 rounded-xl text-white/80 font-mono text-sm focus:outline-none"
+                                className="flex-1 px-5 py-4 bg-black/20 border border-white/10 rounded-xl text-[#40902e] font-mono text-sm focus:outline-none selection:bg-[#40902e] selection:text-white"
                             />
                             <Button
                                 onClick={copyToClipboard}
                                 variant="outline"
-                                className="px-4 border-slate-600 hover:bg-slate-700"
+                                className="h-auto w-16 border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-xl"
                             >
-                                {copied ? <Check className="size-5 text-emerald-400" /> : <Copy className="size-5" />}
+                                {copied ? <Check className="size-5 text-[#40902e]" /> : <Copy className="size-5" />}
                             </Button>
                         </div>
 
                         {copied && (
-                            <p className="text-emerald-400 text-sm mt-2 animate-in fade-in-0">
-                                ✓ Copied to clipboard!
+                            <p className="text-[#40902e] text-sm mt-3 animate-in fade-in-0 flex items-center justify-center gap-2">
+                                <Check className="size-3" /> Copied to clipboard
                             </p>
                         )}
                     </div>
                 )}
 
                 {/* Instructions */}
-                <div className="mt-8 p-4 bg-slate-800/30 border border-slate-700/50 rounded-xl text-sm text-slate-400">
-                    <h3 className="font-medium text-slate-300 mb-2">How it works:</h3>
-                    <ol className="list-decimal list-inside space-y-1">
-                        <li>Enter the Climate Dictionary term (e.g., &quot;Carbon Footprint&quot;)</li>
-                        <li>Click &quot;Generate Link&quot; to create a shareable URL</li>
-                        <li>Copy the link and add it to your social media post</li>
-                        <li>When users click the link, Atmo opens and explains the term automatically</li>
-                    </ol>
+                <div className="mt-12 text-center text-white/30 text-sm space-y-2">
+                    <p>Internal tool for Africa Climate Collaborative.</p>
                 </div>
             </div>
         </div>
+    );
     );
 }
