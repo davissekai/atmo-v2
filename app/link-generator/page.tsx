@@ -41,7 +41,6 @@ export default function LinkGeneratorPage() {
 
 
     return (
-    return (
         <div className="min-h-screen bg-[#0A100D] text-white font-sans selection:bg-[#40902e] selection:text-white p-6 md:p-12 relative overflow-hidden">
             {/* Background Glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#40902e] rounded-full blur-[180px] opacity-10 pointer-events-none" />
