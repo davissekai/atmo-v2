@@ -1,5 +1,6 @@
 import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 import { getCacheKey, getCachedResponse, setCachedResponse } from "@/lib/ai/cache";
+import { searchWeb, shouldSearch, formatSearchContext } from "@/lib/ai/tavily";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_ID = "stepfun/step-3.5-flash:free";
@@ -52,8 +53,35 @@ export async function POST(req: Request) {
       }
     }
 
-    // Build messages with system prompt
-    const systemPrompt = deepThink ? deepThinkPrompt : regularPrompt;
+    // Check if query needs web search for real-time data
+    const needsSearch = shouldSearch(userQuery);
+    let searchContext = "";
+    let sources: { title: string; url: string; content: string }[] = [];
+
+    if (needsSearch) {
+      console.log("API Route: Query triggers web search");
+      const searchResults = await searchWeb(userQuery);
+      if (searchResults && searchResults.results.length > 0) {
+        searchContext = formatSearchContext(searchResults);
+
+        // Only include sources with high relevance score (>0.5)
+        const relevantResults = searchResults.results.filter(r => r.score > 0.5);
+        sources = relevantResults.slice(0, 5).map(r => ({
+          title: r.title,
+          url: r.url,
+          content: r.content?.slice(0, 150) || "",
+        }));
+
+        console.log(`API Route: Search completed. ${searchResults.results.length} total, ${sources.length} relevant sources`);
+      }
+    }
+
+    // Build system prompt with search context if available
+    const basePrompt = deepThink ? deepThinkPrompt : regularPrompt;
+    const systemPrompt = searchContext
+      ? `${basePrompt}\n\n${searchContext}`
+      : basePrompt;
+
     const allMessages = [
       { role: "system", content: systemPrompt },
       ...messages
@@ -108,6 +136,11 @@ export async function POST(req: Request) {
               if (isCacheable && fullResponse) {
                 const cacheKey = getCacheKey(MODEL_ID, userQuery);
                 setCachedResponse(cacheKey, fullResponse);
+              }
+
+              // Emit sources if web search was used (custom event prefix '9:')
+              if (sources.length > 0) {
+                controller.enqueue(encoder.encode(`9:${JSON.stringify(sources)}\n`));
               }
 
               // Send finish events
