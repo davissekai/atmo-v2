@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSimpleChat } from "@/hooks/use-simple-chat";
-import { Message, ThinkingMessage, SearchingMessage } from "@/components/message";
+import { Message, ThinkingMessage } from "@/components/message";
 import { SourcesPanel } from "@/components/sources-panel";
 import { toUIMessage } from "@/lib/simple-chat-types";
 import {
