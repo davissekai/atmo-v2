@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSimpleChat } from "@/hooks/use-simple-chat";
-import { Message, ThinkingMessage } from "@/components/message";
+import { Message, ThinkingMessage, SearchingMessage } from "@/components/message";
+import { SourcesPanel } from "@/components/sources-panel";
 import { toUIMessage } from "@/lib/simple-chat-types";
 import {
   PromptInput,
@@ -20,7 +21,7 @@ import { cn } from "@/lib/utils";
 export function Chat() {
   const searchParams = useSearchParams();
   const [isDeepThink, setIsDeepThink] = useState(false);
-  const { messages, status, error, clearError, sendMessage, stop, retry } = useSimpleChat({ deepThink: isDeepThink });
+  const { messages, status, error, clearError, sendMessage, stop, retry, sources } = useSimpleChat({ deepThink: isDeepThink });
   const [input, setInput] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [hasProcessedDeepLink, setHasProcessedDeepLink] = useState(false);
@@ -119,6 +120,11 @@ export function Chat() {
             ))}
 
             {status === "streaming" && <ThinkingMessage />}
+
+            {/* Sources Panel - show after response is complete */}
+            {status === "ready" && sources.length > 0 && (
+              <SourcesPanel sources={sources} />
+            )}
 
             {/* Error Display */}
             {status === "error" && error && (

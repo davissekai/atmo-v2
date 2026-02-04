@@ -35,6 +35,7 @@ export function useSimpleChat({
   const [messages, setMessages] = useState<SimpleMessage[]>(initialMessages);
   const [status, setStatus] = useState<"ready" | "streaming" | "error">("ready");
   const [error, setError] = useState<ChatError | null>(null);
+  const [sources, setSources] = useState<{ title: string; url: string; content: string }[]>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastInputRef = useRef<string>("");
 
@@ -58,8 +59,9 @@ export function useSimpleChat({
       // Store for retry
       lastInputRef.current = content;
 
-      // Clear any previous error
+      // Clear any previous error and sources
       setError(null);
+      setSources([]);
 
 
       const userMessage: SimpleMessage = {
@@ -164,6 +166,17 @@ export function useSimpleChat({
                 console.error("Error parsing stream chunk:", e);
               }
             }
+            // Sources from web search (custom '9:' event)
+            else if (line.startsWith('9:')) {
+              try {
+                const sourcesData = JSON.parse(line.substring(2));
+                if (Array.isArray(sourcesData)) {
+                  setSources(sourcesData);
+                }
+              } catch (e) {
+                console.error("Error parsing sources:", e);
+              }
+            }
             // Error part
             else if (line.startsWith('3:')) {
               try {
@@ -231,5 +244,6 @@ export function useSimpleChat({
     sendMessage,
     stop,
     retry,
+    sources,
   };
 }
