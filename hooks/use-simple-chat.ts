@@ -134,16 +134,18 @@ export function useSimpleChat({
         // Read the stream
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
+        let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
           const chunk = decoder.decode(value, { stream: true });
+          buffer += chunk;
 
-          // Parse data stream protocol (simplified)
-          // Format: type:"content"\n
-          const lines = chunk.split('\n');
+          const lines = buffer.split('\n');
+          // Keep the last part in the buffer if it's not empty (it might be an incomplete line)
+          buffer = lines.pop() || "";
 
           for (const line of lines) {
             if (!line) continue;

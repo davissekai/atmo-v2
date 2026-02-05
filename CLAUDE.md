@@ -4,14 +4,14 @@ This file provides guidance to Claude when working with this codebase.
 
 ## Project Overview
 
-**Atmo** - An AI-powered Climate Assistant that helps users understand environmental topics and sustainability. Features real-time streaming chat with Gemini 3 Flash and a Deep Think mode for rigorous analysis.
+**Atmo** - An AI-powered Climate Assistant that helps users understand environmental topics and sustainability. Features real-time streaming chat with StepFun 3.5 Flash (via OpenRouter) and a Deep Think mode for rigorous analysis.
 
 ## Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS 4
-- **AI:** Google Gemini via @ai-sdk/google
+- **AI:** StepFun 3.5 Flash via OpenRouter
 - **UI Components:** Radix UI primitives
 - **Animations:** Framer Motion
 - **State Management:** React hooks + usehooks-ts
@@ -30,7 +30,8 @@ npm run lint     # Run ESLint
 ### Environment Variables
 
 Required in `.env.local`:
-- `GOOGLE_GENERATIVE_AI_API_KEY` - Google Gemini API key
+- `OPENROUTER_API_KEY` - OpenRouter API key
+- `TAVILY_API_KEY` - Tavily API key (for web search)
 
 ## Code Conventions
 

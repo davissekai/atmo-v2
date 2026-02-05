@@ -6,7 +6,7 @@ This document tracks the technical evolution, major breakthroughs, and challenge
 
 ### 1. Deep Think Reasoning Engine
 - **Insight**: Users needed high-level analysis that wasn't just "surface level."
-- **Solution**: Successfully integrated Gemini's `thinkingLevel` and custom First-Principles/Systems-Thinking prompt frameworks. 
+- **Solution**: Successfully implemented custom First-Principles/Systems-Thinking prompt frameworks using StepFun 3.5 Flash.
 - **Impact**: Atmo now performs internal reasoning before responding, providing much more structured and accurate climate analysis.
 
 ### 2. The "ChatGPT" Pill Input
