@@ -78,11 +78,22 @@ export async function POST(req: Request) {
       }
     }
 
-    // Build system prompt with search context if available
+    // Build system prompt with search context and current date
     const basePrompt = deepThink ? deepThinkPrompt : regularPrompt;
+
+    // Inject current date so model knows "today" (using UTC/GMT)
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC'
+    });
+    const dateContext = `Current date: ${currentDate} (UTC).`;
+
     const systemPrompt = searchContext
-      ? `${basePrompt}\n\n${searchContext}`
-      : basePrompt;
+      ? `${basePrompt}\n\n${dateContext}\n\n${searchContext}`
+      : `${basePrompt}\n\n${dateContext}`;
 
     const allMessages = [
       { role: "system", content: systemPrompt },
