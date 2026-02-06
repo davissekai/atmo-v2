@@ -121,13 +121,25 @@ export async function POST(req: Request) {
     let fullResponse = "";
 
     const transformStream = new TransformStream({
+      // Persistent decoder and buffer for handling chunk boundaries
+      start() {
+        (this as any).decoder = new TextDecoder();
+        (this as any).buffer = "";
+      },
       async transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        const lines = text.split("\n").filter(line => line.trim() !== "");
+        const text = (this as any).decoder.decode(chunk, { stream: true });
+        (this as any).buffer += text;
+
+        // Split on newlines, keeping incomplete lines in the buffer
+        const lines = (this as any).buffer.split("\n");
+        (this as any).buffer = lines.pop() || ""; // Keep last incomplete line
 
         for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
+          const trimmedLine = line.trim();
+          if (!trimmedLine) continue;
+
+          if (trimmedLine.startsWith("data: ")) {
+            const data = trimmedLine.slice(6);
             if (data === "[DONE]") {
               // Stream finished
               const duration = Date.now() - startTime;
@@ -160,8 +172,27 @@ export async function POST(req: Request) {
                 controller.enqueue(encoder.encode(`0:${JSON.stringify(content)}\n`));
               }
             } catch (e) {
-              // Skip unparseable chunks
+              // JSON parse failed - this line might be incomplete, add back to buffer
+              (this as any).buffer = trimmedLine + "\n" + (this as any).buffer;
+              break; // Stop processing lines, wait for more data
             }
+          }
+        }
+      },
+      flush(controller) {
+        // Process any remaining buffer content
+        const remaining = (this as any).buffer.trim();
+        if (remaining && remaining.startsWith("data: ")) {
+          const data = remaining.slice(6);
+          try {
+            const parsed = JSON.parse(data);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              fullResponse += content;
+              controller.enqueue(encoder.encode(`0:${JSON.stringify(content)}\n`));
+            }
+          } catch (e) {
+            console.error("API Route: Failed to parse remaining buffer:", e);
           }
         }
       }
