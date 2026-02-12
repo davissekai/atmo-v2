@@ -18,8 +18,8 @@ export default function LinkGeneratorPage() {
         // URL-encode the prompt
         const encodedPrompt = encodeURIComponent(prompt);
 
-        // Generate the full URL (production URL)
-        const baseUrl = "https://atmo-v2.vercel.app";
+        // Generate the full URL using the current origin
+        const baseUrl = window.location.origin;
         const fullUrl = `${baseUrl}/chat?prompt=${encodedPrompt}`;
 
         setGeneratedLink(fullUrl);
