@@ -3,7 +3,7 @@
  * Provides real-time web search capabilities for grounding AI responses.
  */
 
-const TAVILY_API_URL = "https://api.tavily.com/search";
+const TAVILY_API_URL = process.env.TAVILY_API_URL || "https://api.tavily.com/search";
 
 export interface TavilyResult {
     title: string;
