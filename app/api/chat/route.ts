@@ -4,8 +4,8 @@ import { searchWeb, shouldSearch, formatSearchContext } from "@/lib/ai/tavily";
 
 export const runtime = 'edge';
 
-const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL_ID = "stepfun/step-3.5-flash:free";
+const OPENROUTER_API_URL = process.env.OPENROUTER_API_URL || "https://openrouter.ai/api/v1/chat/completions";
+const MODEL_ID = process.env.NEXT_PUBLIC_OPENROUTER_MODEL_ID || "stepfun/step-3.5-flash:free";
 
 export async function POST(req: Request) {
   console.log("API Route: Using OpenRouter with model:", MODEL_ID);

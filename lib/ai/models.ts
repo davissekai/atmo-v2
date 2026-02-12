@@ -1,5 +1,5 @@
 // Curated list of top models
-export const DEFAULT_CHAT_MODEL = "stepfun/step-3.5-flash:free";
+export const DEFAULT_CHAT_MODEL = process.env.NEXT_PUBLIC_OPENROUTER_MODEL_ID || "stepfun/step-3.5-flash:free";
 
 export type ChatModel = {
   id: string;
