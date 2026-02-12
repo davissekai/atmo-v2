@@ -3,15 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import { SimpleMessage } from "@/lib/simple-chat-types";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-
-// Fallback ID generator for environments where crypto.randomUUID is unavailable
-function generateId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  // Fallback for older environments
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 9)}`;
-}
+import { generateUUID } from "@/lib/utils";
 
 interface UseSimpleChatProps {
   initialMessages?: SimpleMessage[];
@@ -65,13 +57,13 @@ export function useSimpleChat({
 
 
       const userMessage: SimpleMessage = {
-        id: generateId(),
+        id: generateUUID(),
         role: "user",
         content,
       };
 
       const assistantMessage: SimpleMessage = {
-        id: generateId(),
+        id: generateUUID(),
         role: "assistant",
         content: "",
       };
