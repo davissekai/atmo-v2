@@ -27,6 +27,11 @@ npm install
 Create a `.env.local` file:
 
 ```bash
+# Recommended: Gemini free tier with Google Search grounding
+GEMINI_API_KEY=your_gemini_api_key   # https://aistudio.google.com/apikey
+GEMINI_MODEL_ID=gemini-2.5-flash     # optional
+
+# Fallback when GEMINI_API_KEY is not set
 OPENROUTER_API_KEY=your_openrouter_api_key
 TAVILY_API_KEY=your_tavily_api_key
 ```
