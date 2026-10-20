@@ -1,6 +1,14 @@
 import { regularPrompt, deepThinkPrompt } from "@/lib/ai/prompts";
 import { getCacheKey, getCachedResponse, setCachedResponse } from "@/lib/ai/cache";
 import { searchWeb, shouldSearch, formatSearchContext } from "@/lib/ai/tavily";
+import {
+  GEMINI_MODEL_ID,
+  isGeminiConfigured,
+  streamGemini,
+  extractGeminiText,
+  extractGeminiSources,
+  type GeminiSource,
+} from "@/lib/ai/gemini";
 
 export const runtime = 'edge';
 
@@ -8,7 +16,11 @@ const OPENROUTER_API_URL = process.env.OPENROUTER_API_URL || "https://openrouter
 const MODEL_ID = process.env.NEXT_PUBLIC_OPENROUTER_MODEL_ID || "stepfun/step-3.5-flash:free";
 
 export async function POST(req: Request) {
-  console.log("API Route: Using OpenRouter with model:", MODEL_ID);
+  // Gemini (free tier + Google Search grounding) when GEMINI_API_KEY is set,
+  // otherwise fall back to OpenRouter so nothing breaks before the key is added.
+  const useGemini = isGeminiConfigured();
+  const activeModel = useGemini ? GEMINI_MODEL_ID : MODEL_ID;
+  console.log("API Route: Using", useGemini ? "Gemini" : "OpenRouter", "with model:", activeModel);
   const startTime = Date.now();
 
   try {
@@ -30,7 +42,7 @@ export async function POST(req: Request) {
     const isCacheable = messages.length === 1 && !deepThink && userQuery.length > 0;
 
     if (isCacheable) {
-      const cacheKey = getCacheKey(MODEL_ID, userQuery);
+      const cacheKey = getCacheKey(activeModel, userQuery);
       const cachedResponse = getCachedResponse(cacheKey);
 
       if (cachedResponse) {
@@ -60,7 +72,8 @@ export async function POST(req: Request) {
     let searchContext = "";
     let sources: { title: string; url: string; content: string }[] = [];
 
-    if (needsSearch) {
+    // With Gemini, search is done by Google Search grounding instead of Tavily.
+    if (needsSearch && !useGemini) {
       console.log("API Route: Query triggers web search");
       const searchResults = await searchWeb(userQuery);
       if (searchResults && searchResults.results.length > 0) {
@@ -99,6 +112,18 @@ export async function POST(req: Request) {
       { role: "system", content: systemPrompt },
       ...messages
     ];
+
+    if (useGemini) {
+      return handleGemini({
+        systemPrompt,
+        messages,
+        useSearch: needsSearch,
+        deepThink: Boolean(deepThink),
+        isCacheable,
+        cacheKey: getCacheKey(activeModel, userQuery),
+        startTime,
+      });
+    }
 
     console.log("API Route: Calling OpenRouter...");
 
@@ -159,7 +184,7 @@ export async function POST(req: Request) {
 
               // Cache if applicable
               if (isCacheable && fullResponse) {
-                const cacheKey = getCacheKey(MODEL_ID, userQuery);
+                const cacheKey = getCacheKey(activeModel, userQuery);
                 setCachedResponse(cacheKey, fullResponse);
               }
 
@@ -223,4 +248,90 @@ export async function POST(req: Request) {
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
+}
+
+const FINISH_EVENTS =
+  `e:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0},"isContinued":false}\n` +
+  `d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`;
+
+async function handleGemini(opts: {
+  systemPrompt: string;
+  messages: { role: string; content: string }[];
+  useSearch: boolean;
+  deepThink: boolean;
+  isCacheable: boolean;
+  cacheKey: string;
+  startTime: number;
+}): Promise<Response> {
+  console.log("API Route: Calling Gemini...", opts.useSearch ? "(with Google Search)" : "");
+
+  const response = await streamGemini({
+    systemPrompt: opts.systemPrompt,
+    messages: opts.messages,
+    useSearch: opts.useSearch,
+    deepThink: opts.deepThink,
+  });
+
+  if (!response.ok || !response.body) {
+    const errorText = await response.text();
+    console.error("Gemini error:", response.status, errorText);
+    return new Response(
+      JSON.stringify({ error: `Gemini error: ${response.status}` }),
+      { status: response.status || 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let fullResponse = "";
+  const sourcesByUrl = new Map<string, GeminiSource>();
+
+  const handleLine = (line: string, controller: TransformStreamDefaultController<Uint8Array>) => {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("data: ")) return;
+    try {
+      const parsed = JSON.parse(trimmed.slice(6));
+      const text = extractGeminiText(parsed);
+      if (text) {
+        fullResponse += text;
+        controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`));
+      }
+      for (const source of extractGeminiSources(parsed)) {
+        sourcesByUrl.set(source.url, source);
+      }
+    } catch (e) {
+      console.error("API Route: Failed to parse Gemini chunk:", e);
+    }
+  };
+
+  const transformStream = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      buffer += decoder.decode(chunk, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+      for (const line of lines) handleLine(line, controller);
+    },
+    flush(controller) {
+      if (buffer.trim()) handleLine(buffer, controller);
+
+      console.log("API Route: Gemini response completed in", Date.now() - opts.startTime, "ms");
+      if (opts.isCacheable && fullResponse) {
+        setCachedResponse(opts.cacheKey, fullResponse);
+      }
+
+      const sources = Array.from(sourcesByUrl.values()).slice(0, 5);
+      if (sources.length > 0) {
+        controller.enqueue(encoder.encode(`9:${JSON.stringify(sources)}\n`));
+      }
+      controller.enqueue(encoder.encode(FINISH_EVENTS));
+    },
+  });
+
+  return new Response(response.body.pipeThrough(transformStream), {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "x-vercel-ai-data-stream": "v1",
+    },
+  });
 }
